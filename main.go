@@ -115,6 +115,34 @@ func main() {
 		product[pID] = reqBody.Name
 		return c.JSON(http.StatusOK, products)
 	})
+
+	e.DELETE("/products/:id", func(c echo.Context) error {
+		var product map[int]string
+		var index int
+		pID, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			fmt.Println(err.Error())
+			return err
+		}
+		for i, p := range products {
+			for k := range p {
+				if pID == k {
+					product = p
+					index = i
+				}
+			}
+		}
+		if product == nil {
+			return c.JSON(http.StatusNotFound, "product not found")
+		}
+		slice := func(s []map[int]string, index int) []map[int]string {
+			//[1,2,3,4,5]
+			// [1,2]+[4,5] = [1,2,4,5]
+			return append(s[:index], s[index+1:]...)
+		}
+		products = slice(products, index)
+		return c.JSON(http.StatusOK, products)
+	})
 	e.Logger.Print("listening on port %s", port)
 	e.Logger.Fatal(e.Start(fmt.Sprintf("localhost:%s", port)))
 }
