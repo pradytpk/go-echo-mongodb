@@ -83,6 +83,38 @@ func main() {
 	e.GET("/route/:vendor", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, c.QueryParam("olderThan"))
 	})
+
+	e.PUT("/products/:id", func(c echo.Context) error {
+		var product map[int]string
+		pID, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			fmt.Println(err.Error())
+			return err
+		}
+		for _, p := range products {
+			for k := range p {
+				if pID == k {
+					product = p
+				}
+			}
+		}
+		if product == nil {
+			return c.JSON(http.StatusNotFound, "product not found")
+		}
+		type body struct {
+			Name string `json:"product_name" validate:"required,min=4"`
+		}
+		var reqBody body
+		if err := c.Bind(&reqBody); err != nil {
+			return err
+		}
+		e.Validator = &ProductValidator{validator: v}
+		if err = c.Validate(reqBody); err != nil {
+			return err
+		}
+		product[pID] = reqBody.Name
+		return c.JSON(http.StatusOK, products)
+	})
 	e.Logger.Print("listening on port %s", port)
 	e.Logger.Fatal(e.Start(fmt.Sprintf("localhost:%s", port)))
 }
