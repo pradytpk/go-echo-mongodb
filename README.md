@@ -1,9 +1,14 @@
-# Echo Practise
+# Echo Practise With MongoDb
+
+
+## Mongo DB
+- Document Oriented database 
+- Non relational Database
+
 
 ## Sample API
 ### POST
 ```json
-
 {
   "product_name":"one",
   "vendor":"apple",
@@ -12,5 +17,4 @@
   "country":"US",
   "default_device_ip":"192.168.9.8"
 }
-
 ```
