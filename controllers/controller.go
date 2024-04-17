@@ -8,14 +8,15 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/pradytpk/go-echo-mongodb/handlers"
-	"github.com/pradytpk/go-echo-mongodb/middleware"
+	"github.com/pradytpk/go-echo-mongodb/middlewares"
 )
 
-var e = echo.New()
-var v = validator.New()
-
-// Start starts the application
 func Start() {
+	var e = echo.New()
+
+	// Initialize and register validator
+	e.Validator = &handlers.ProductValidator{Validator: validator.New()}
+
 	//Env variable
 	err := godotenv.Load()
 	if err != nil {
@@ -26,7 +27,7 @@ func Start() {
 	if port == "" {
 		port = "8080"
 	}
-	e.Use(middleware.ServerMessage)
+	e.Use(middlewares.ServerMessage)
 	e.GET("/", handlers.HealthCheck)
 	e.GET("/products", handlers.GetProducts)
 	e.POST("/products", handlers.CreateProduct)

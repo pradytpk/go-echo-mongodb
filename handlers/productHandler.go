@@ -11,12 +11,22 @@ import (
 
 // ProductValidator echo validator for product
 type ProductValidator struct {
-	validator *validator.Validate
+	Validator *validator.Validate // Change field name to Validator to avoid conflicts
+}
+
+var e *echo.Echo
+
+func init() {
+	e = echo.New()
+	// Other initialization code for e, such as middleware configuration, could go here
 }
 
 // Validate validates product request body
 func (p *ProductValidator) Validate(i interface{}) error {
-	return p.validator.Struct(i)
+	if err := p.Validator.Struct(i); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return nil
 }
 
 var products = []map[int]string{
@@ -31,10 +41,7 @@ var products = []map[int]string{
 	},
 }
 
-var e = echo.New()
-
 func HealthCheck(c echo.Context) error {
-	fmt.Println("Inside handler")
 	return c.String(http.StatusOK, "Test echo framework")
 }
 
@@ -43,6 +50,7 @@ func GetProducts(c echo.Context) error {
 }
 
 func CreateProduct(c echo.Context) error {
+	fmt.Println("validator", e.Validator)
 	type body struct {
 		Name            string `json:"product_name" validate:"required,min=4"`
 		Vendor          string `json:"vendor" validate:"min=5,max=10"`
@@ -53,10 +61,12 @@ func CreateProduct(c echo.Context) error {
 	}
 	var reqBody body
 	if err := c.Bind(&reqBody); err != nil {
+		fmt.Println(err.Error())
 		return err
 	}
-	e.Validator = &ProductValidator{validator: validator.New()}
-	if err := c.Validate(reqBody); err != nil {
+
+	if err := c.Validate(&reqBody); err != nil {
+		fmt.Println(err.Error())
 		return err
 	}
 	product := map[int]string{
@@ -90,8 +100,7 @@ func UpdateProduct(c echo.Context) error {
 	if err := c.Bind(&reqBody); err != nil {
 		return err
 	}
-	e.Validator = &ProductValidator{validator: validator.New()}
-	if err = c.Validate(reqBody); err != nil {
+	if err := c.Validate(reqBody); err != nil {
 		return err
 	}
 	product[pID] = reqBody.Name
