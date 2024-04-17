@@ -34,6 +34,7 @@ var products = []map[int]string{
 var e = echo.New()
 
 func HealthCheck(c echo.Context) error {
+	fmt.Println("Inside handler")
 	return c.String(http.StatusOK, "Test echo framework")
 }
 

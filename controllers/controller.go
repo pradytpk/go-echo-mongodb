@@ -8,11 +8,13 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/pradytpk/go-echo-mongodb/handlers"
+	"github.com/pradytpk/go-echo-mongodb/middleware"
 )
 
 var e = echo.New()
 var v = validator.New()
 
+// Start starts the application
 func Start() {
 	//Env variable
 	err := godotenv.Load()
@@ -24,6 +26,7 @@ func Start() {
 	if port == "" {
 		port = "8080"
 	}
+	e.Use(middleware.ServerMessage)
 	e.GET("/", handlers.HealthCheck)
 	e.GET("/products", handlers.GetProducts)
 	e.POST("/products", handlers.CreateProduct)
