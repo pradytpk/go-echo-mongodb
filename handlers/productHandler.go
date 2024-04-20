@@ -41,14 +41,17 @@ var products = []map[int]string{
 	},
 }
 
+// HealthCheck to check api is working
 func HealthCheck(c echo.Context) error {
 	return c.String(http.StatusOK, "Test echo framework")
 }
 
+// GetProducts to get the product data
 func GetProducts(c echo.Context) error {
 	return c.JSON(http.StatusOK, products)
 }
 
+// CreateProduct to create a product
 func CreateProduct(c echo.Context) error {
 	fmt.Println("validator", e.Validator)
 	type body struct {
@@ -76,6 +79,7 @@ func CreateProduct(c echo.Context) error {
 	return c.JSON(http.StatusOK, products)
 }
 
+// UpdateProduct Update the product
 func UpdateProduct(c echo.Context) error {
 	var product map[int]string
 	pID, err := strconv.Atoi(c.Param("id"))
@@ -107,6 +111,7 @@ func UpdateProduct(c echo.Context) error {
 	return c.JSON(http.StatusOK, products)
 }
 
+// DeleteProduct delete product
 func DeleteProduct(c echo.Context) error {
 	var product map[int]string
 	var index int
